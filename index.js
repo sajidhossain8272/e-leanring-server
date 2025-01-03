@@ -1,10 +1,11 @@
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-require("dotenv").config();
 
 // Initialize Express
 const app = express();
@@ -12,6 +13,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
 
 // MongoDB Connection
 mongoose
@@ -185,6 +187,21 @@ app.post("/api/profile/update", async (req, res) => {
     res.status(400).json({ message: "Invalid token" });
   }
 });
+
+
+const path = require("path");
+
+// Catch-all route to serve front-end for undefined routes
+app.use((req, res, next) => {
+  if (!req.path.startsWith("/api")) {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  } else {
+    next();
+  }
+});
+
+app.use(express.static(path.join(__dirname, "client", "build")));
+
 
 
 // Start the Server
